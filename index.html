@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>性教育迷思測驗 - 滑動探索</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Zen Maru Gothic', '粉圓體', 'Microsoft JhengHei', '微軟正黑體', sans-serif !important;
+            font-weight: 400;
+        }
+        
+        .cute-title {
+            font-family: 'Zen Maru Gothic', '粉圓體', sans-serif !important;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        
+        .cute-text {
+            font-family: 'Zen Maru Gothic', '粉圓體', sans-serif !important;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.7;
+        }
+        
+        .cute-button {
+            font-family: 'Zen Maru Gothic', '圓體', 'Microsoft JhengHei UI', '微軟正黑體', sans-serif !important;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card-stack {
+            perspective: 1000px;
+        }
+        
+        .question-card {
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            transform-style: preserve-3d;
+        }
+        
+        .card-swipe-left {
+            transform: translateX(-100%) rotate(-30deg);
+            opacity: 0;
+        }
+        
+        .card-swipe-right {
+            transform: translateX(100%) rotate(30deg);
+            opacity: 0;
+        }
+        
+        .result-animation {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .sparkle {
+            animation: sparkle 2s infinite;
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .magic-glow {
+            animation: magicGlow 2s ease-in-out infinite alternate;
+        }
+        
+        .simple-animation {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-8px) rotate(2deg); }
+            66% { transform: translateY(-12px) rotate(-1deg); }
+        }
+        
+        .floating-slow {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+        
+        .floating-medium {
+            animation: floatMedium 3.5s ease-in-out infinite;
+        }
+        
+        .floating-fast {
+            animation: floatFast 2.8s ease-in-out infinite;
+        }
+        
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-15px) rotate(3deg) scale(1.05); }
+        }
+        
+        @keyframes floatMedium {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-12px) rotate(-2deg) scale(1.03); }
+        }
+        
+        @keyframes floatFast {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-8px) rotate(1deg) scale(1.02); }
+        }
+        
+        @keyframes magicGlow {
+            from { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+            to { box-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(147, 51, 234, 0.3); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .admin-hint {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl mx-auto">
+        <div id="startScreen" class="text-center text-white relative">
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                <div class="absolute top-10 left-10 text-2xl opacity-60 floating-slow" style="animation-delay: 0s;">💕</div>
+                <div class="absolute top-20 right-16 text-xl opacity-50 floating-medium" style="animation-delay: 1s;">🌸</div>
+                <div class="absolute top-32 left-1/4 text-lg opacity-40 floating-fast" style="animation-delay: 2s;">💖</div>
+                <div class="absolute top-40 right-1/3 text-2xl opacity-60 floating-slow" style="animation-delay: 0.5s;">🦋</div>
+                <div class="absolute bottom-40 left-12 text-xl opacity-50 floating-medium" style="animation-delay: 1.5s;">🌺</div>
+                <div class="absolute bottom-32 right-20 text-lg opacity-40 floating-fast" style="animation-delay: 2.5s;">💐</div>
+                <div class="absolute bottom-20 left-1/3 text-2xl opacity-60 floating-slow" style="animation-delay: 3s;">🌹</div>
+                <div class="absolute top-1/2 left-8 text-sm opacity-30 floating-medium" style="animation-delay: 1.8s;">💝</div>
+                <div class="absolute top-1/3 right-8 text-sm opacity-30 floating-fast" style="animation-delay: 2.2s;">🎀</div>
+                <div class="absolute top-16 left-1/2 text-lg opacity-45 floating-medium" style="animation-delay: 0.8s;">🌷</div>
+                <div class="absolute bottom-16 right-1/4 text-xl opacity-55 floating-slow" style="animation-delay: 2.8s;">💞</div>
+                <div class="absolute top-1/4 left-20 text-sm opacity-35 floating-fast" style="animation-delay: 1.2s;">🌻</div>
+            </div>
+            
+            <div class="mb-8 float relative z-10">
+                <div class="sparkle">
+                    <h1 class="text-4xl cute-title mb-4 cursor-pointer select-none" id="mainTitle">✨ <span class="text-5xl text-pink-300">性</span>教育迷思測驗 ✨</h1>
+                </div>
+                <p class="text-lg opacity-90 cute-text">🌟 破除性迷思，學習正確知識 🌟</p>
+                <p class="text-sm opacity-75 mt-2 cute-text">左滑 = ❌ | 右滑 = ✅</p>
+                <div class="mt-4 text-2xl sparkle">🔮💫⭐</div>
+                
+                <div class="mt-6 flex justify-center space-x-4">
+                    <div class="text-pink-300 text-lg sparkle" style="animation-delay: 0.5s;">💗</div>
+                    <div class="text-red-300 text-xl sparkle" style="animation-delay: 1s;">❤️</div>
+                    <div class="text-pink-300 text-lg sparkle" style="animation-delay: 1.5s;">💗</div>
+                </div>
+            </div>
+            
+            <button onclick="startQuiz()" class="bg-white text-purple-600 px-8 py-4 rounded-full cute-button text-lg hover:bg-gray-100 transition-colors shadow-lg magic-glow sparkle">
+                ✨ 開始魔法測驗 ✨
+            </button>
+        </div>
+
+        <div id="quizScreen" class="hidden">
+            <div class="mb-6">
+                <div class="bg-white bg-opacity-20 rounded-full h-2">
+                    <div id="progressBar" class="bg-white rounded-full h-2 transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p class="text-white text-center mt-2 text-sm cute-text">
+                    <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span>
+                </p>
+            </div>
+
+            <div class="card-stack relative h-[40rem] sm:h-[44rem]">
+                <div id="questionCard" class="question-card absolute inset-0 bg-white rounded-2xl card-shadow overflow-hidden cursor-pointer">
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400" id="cardBackground">
+                        </div>
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
+                    
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-4xl sm:text-5xl flex-shrink-0" id="questionEmoji">🤔</div>
+                            <div class="flex-1 min-w-0">
+                                <h2 class="text-xl sm:text-2xl cute-title text-white mb-2 leading-tight drop-shadow-lg" id="questionText">載入中...</h2>
+                                <p class="text-white text-sm sm:text-base leading-relaxed mb-4 drop-shadow-md cute-text" id="questionDesc">請稍候</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center space-x-6 mt-8">
+                <button onclick="swipeLeft()" class="bg-orange-500 hover:bg-orange-600 text-white w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-3xl sm:text-4xl transition-colors shadow-lg">
+                    🚫
+                </button>
+                <button onclick="swipeRight()" class="bg-green-500 hover:bg-green-600 text-white w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-3xl sm:text-4xl transition-colors shadow-lg">
+                    ✅
+                </button>
+            </div>
+        </div>
+
+        <div id="resultScreen" class="hidden">
+            <div class="relative w-full mb-8 max-w-2xl mx-auto">
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden result-animation border-4 border-dashed border-gray-300 flex items-center justify-center" style="width: 595px; height: 842px; max-width: 100%;">
+                    <div class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center p-4" id="resultBackground">
+                        <div id="resultImagePlaceholder" class="w-full h-full bg-cover bg-center" style="background-image: url('{{請將您的預設結果背景圖路徑放在這裡，例如：images/default_result_bg.jpg}}');">
+                        </div>
+                    </div>
+                    
+                   
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button onclick="restartQuiz()" class="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                    🔄 重新魔法測驗
+                </button>
+                <button onclick="toggleAnalysis()" id="toggleAnalysisBtn" class="bg-gradient-to-r from-blue-500 to-teal-600 hover:from-blue-600 hover:to-teal-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                    📚 查看魔法解析
+                </button>
+            </div>
+            
+            <div id="wrongAnswersSection" class="mt-8 hidden">
+                <h3 class="text-2xl cute-title mb-6 text-center text-white sparkle">✨📚 魔法知識解析 📖✨</h3>
+                <div id="wrongAnswersList" class="space-y-6 text-left max-h-96 overflow-y-auto mb-8">
+                    </div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="restartQuiz()" class="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                        🔄 重新魔法測驗
+                    </button>
+                    <button onclick="toggleAnalysis()" class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                        📖 返回結果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 完整的題目庫
+        const mythQuestions = [
+            // 請注意：所有 question.backgroundImage 屬性現在都是空的字串，
+            // 您可以透過修改此處來設定每個題目的背景圖片路徑。
+            {
+                emoji: "💑",
+                text: "只要男生有反應，就可以直接進入性行為了",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！前戲對於性愛品質非常重要，能幫助雙方放鬆、增加潤滑，讓整個過程更舒適愉悅。",
+                backgroundImage: 'images/1.Png'
+            },
+            {
+                emoji: "⚡",
+                text: "性行為時節奏越快，女生會越舒服",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！大多數女性並不會因為激烈動作就高潮，甚至會感到不舒服。溫柔、有節奏的動作通常更有效。",
+                backgroundImage: 'images/10.png'
+            },
+            {
+                emoji: "🎯",
+                text: "靠活塞運動就會讓女生高潮了",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！調查發現75%的女性無法單靠陰道性交達到高潮，通常需要陰蒂刺激才能達到高潮。",
+                backgroundImage: 'images/3.jpg'
+            },
+            {
+                emoji: "😅",
+                text: "精液射在女生臉上，女生才會覺得舒服",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！很多女性會害怕甚至討厭這種行為。這主要是A片情節，現實中需要事先溝通和同意。",
+                backgroundImage: 'images/5.png'
+            },
+            {
+                emoji: "💦",
+                text: "女生其實高潮時大部分都會潮吹啦",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！潮吹並非每個女性都會有的現象，只有部分女性在特定刺激下才會發生。",
+                backgroundImage: 'images/6.png'
+            },
+            {
+                emoji: "⏰",
+                text: "做得越久越厲害",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！男性平均持續時間約3-7分鐘，時間長短不代表性能力，重要的是雙方的滿足感。",
+                backgroundImage: 'images/7.png'
+            },
+            {
+                emoji: "🤸",
+                text: "動作越猛越舒服",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！複雜體位可能導致受傷，簡單舒適的體位往往更能帶來愉悅感受。",
+                backgroundImage: 'images/8.jpg'
+            },
+            {
+                emoji: "💧",
+                text: "口水其實是足夠當性行為的潤滑劑的",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！口水很快就會乾掉，不是理想的潤滑劑，建議使用專門的潤滑產品。",
+                backgroundImage: 'images/9.png'
+            },
+            {
+                emoji: "📏",
+                text: "男性器官越大女生越有感",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！尺寸大小與性愛品質沒有直接關係，技巧、溝通和情感連結更重要。",
+                backgroundImage: 'images/10.png'
+            },
+            {
+                emoji: "🧴",
+                text: "陰道不需要額外的潤滑劑",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！當天然分泌物不足時，使用潤滑劑是正常且建議的，能讓過程更舒適。",
+                backgroundImage: 'images/11.jpg'
+            },
+            {
+                emoji: "👟",
+                text: "陰莖大小跟腳底板的大小有關係",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！身體各部位的大小之間沒有科學證實的關聯性。",
+                backgroundImage: 'images/4.png'
+            },
+            {
+                emoji: "✨",
+                text: "男生的精液可以養顏美容",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！精液雖含有一些營養成分，但濃度不足以產生美容效果。",
+                backgroundImage: 'images/3.jpg'
+            },
+            {
+                emoji: "🛡️",
+                text: "同時戴兩個保險套更安全",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！戴兩個保險套會因摩擦增加破裂風險，正確使用一個就足夠了。",
+                backgroundImage: 'images/1.png'
+            },
+            {
+                emoji: "✂️",
+                text: "女生都會除陰毛",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！除毛是個人選擇，並非大部分女性的做法，每個人的偏好不同。",
+                backgroundImage: 'images/6.png'
+            },
+            {
+                emoji: "👶",
+                text: "年輕男性比年長男性更容易早洩",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！早洩與年齡沒有絕對關係，可能受心理、生理等多種因素影響。",
+                backgroundImage: 'images/7.png'
+            },
+            {
+                emoji: "⚖️",
+                text: "吃避孕藥會增加體重",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！現代避孕藥的荷爾蒙劑量較低，體重增加通常很輕微或沒有。",
+                backgroundImage: 'images/2.png'
+            },5
+            {
+                emoji: "🦠",
+                text: "口交不會傳染性病(EX:菜花)",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！漱口水無法有效預防HPV感染，安全的口交需要使用保險套或口交膜。",
+                backgroundImage: 'images/3.jpg'
+            },
+            {
+                emoji: "🏃",
+                text: "性行為可以幫助減肥",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是正確的！雖然性行為會消耗熱量，可是消耗量有限，不能作為主要的減肥方式。",
+                backgroundImage: 'images/2.png'
+            },
+            {
+                emoji: "🧭",
+                text: "有些特定姿勢或方向可以降低懷孕機率",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！方向與懷孕完全無關，沒有避孕措施就有懷孕風險。",
+                backgroundImage: 'images/8.jpg'
+            },
+            {
+                emoji: "👥",
+                text: "女生都對色情影片都不感興趣啦",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！研究發現女性也會觀看色情內容，這是正常的性行為表現。",
+                backgroundImage:'images/9.png'
+            },
+            {
+                emoji: "💋",
+                text: "性愛中用口是最安全的，不會得病",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！口交也可能傳播性病，包括HPV、梅毒、淋病等，需要防護措施。",
+                backgroundImage: 'images/10.png'
+            },
+            {
+                emoji: "🍫",
+                text: "巧克力可以催情",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！科學證據顯示巧克力並沒有真正的催情效果。",
+                backgroundImage:'images/5.png'
+            },
+            {
+                emoji: "🏪",
+                text: "精液可以累積",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！精液不會無限累積，身體會自然調節和更新精液。",
+                backgroundImage: 'images/6.png'
+            },
+            {
+                emoji: "👙",
+                text: "小胸部的女生都不敏感",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！胸部大小與敏感度沒有直接關係，每個人的敏感度都不同。",
+                backgroundImage: 'images/8.jpg'
+            },
+            {
+                emoji: "🩸",
+                text: "女生月經期間做愛不會懷孕",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！雖然機率較低，但月經期間仍有懷孕可能，特別是週期不規律的女性。",
+                backgroundImage: 'images/10.png'
+            },
+            {
+                emoji: "🚫",
+                text: "體外射精是有棒的避孕方法",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！體外射精失敗率高達22%，因為射精前的分泌物也可能含有精子。",
+                backgroundImage:'images/5.png'
+            },
+            {n
+                emoji: "🦠",
+                text: "性病(例如:菜花)只會透過性行為來傳播",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！某些性病也可能透過其他方式傳播，如皮膚接觸、共用物品等。",
+                backgroundImage: 'images/6.png'
+            },
+            {
+                emoji: "💪",
+                text: "性行為對身心健康沒什麼好處其實",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！WHO明確指出性健康是身心健康的重要組成部分，影響整體生活品質。",
+                backgroundImage: 'images/11.jpg'
+            },
+            {
+                emoji: "🗣️",
+                text: "性行為不用溝通，只要我想要就好",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！良好的溝通能確保雙方都感到舒適和安全，同意是健康性關係的基礎。",
+                backgroundImage: 'images/12.png'
+            },
+            {
+                emoji: "🛡️",
+                text: "保險套主要是心理安慰的，對防護效果根本沒作用",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！正確使用保險套可以大幅降低性病傳播風險，避孕效果也高達98%。",
+                backgroundImage: 'images/12.png'
+            },
+            {
+                emoji: "🧠",
+                text: "性慾這種事一輩子不變",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性慾受到荷爾蒙、壓力、健康狀況等多種因素影響，隨年齡變化是正常的。",
+                backgroundImage: 'images/1.png'
+            },
+            {
+                emoji: "🌈",
+                text: "只有異性戀才是正常的性取向",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性取向是個人特質，多元性向都是正常的，每個人都應該被尊重和接納。",
+                backgroundImage: 'images/8.jpg'
+            },
+            {
+                emoji: "💝",
+                text: "做愛次數多就是表示關係超親密",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！研究顯示，性愛的滿意度與頻率沒有直接關係，品質和雙方感受更重要。",
+                backgroundImage: 'images/9.png'
+            },
+            {
+                emoji: "🎭",
+                text: "認為有性幻想的人就是對現實生活有不滿意",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性幻想是人類正常的心理現象，有助於探索自己的性慾和偏好。",
+                backgroundImage: 'images/1.png'
+            },
+            {
+                emoji: "🏥",
+                text: "沒有症狀就不需要做性健康檢查",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！定期檢查能早期發現和治療性病，維護自己和伴侶的健康。",
+                backgroundImage:'images/2.png'
+            },
+            {
+                emoji: "🤝",
+                text: "性教育只需要教生理知識就夠了",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！完整的性教育不只是生理知識，還包括情感、關係、同意等重要概念。",
+                backgroundImage: 'images/1.png'
+            },
+            {
+                emoji: "🔒",
+                text: "情侶間拒絕對方性要求就是不愛對方",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！身體自主權是基本人權，每個人都有權說「不」，並且應該被尊重。",
+                backgroundImage: 'images/8.jpg'
+            },
+            {
+                emoji: "💊",
+                text: "避孕只有保險套這一種方法而已",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！除了保險套，還有避孕藥、避孕環、避孕貼片等多種選擇，可諮詢醫師選擇適合的方法。",
+                backgroundImage: 'images/9.png'
+            },
+            {
+                emoji: "🧘",
+                text: "性愛對身心健康沒有什麼幫助",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性愛會釋放內啡肽和催產素，有助於減壓、改善心情和增進親密感。",
+                backgroundImage: 'images/11.jpg'
+            },
+            {
+                emoji: "📚",
+                text: "飛機盃是可以重複使用，也不會怎麼樣的",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！飛機杯和保險套一樣是一次性的物品。",
+                backgroundImage: 'images/6.png'
+            },
+            {
+                emoji: "💬",
+                text: "油性潤滑液和保險套一起使用，效果最好",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！油性潤滑液容易乾，因此在發生時會使保險套破裂。",
+                backgroundImage: 'images/5.png'
+            }
+        ];
+
+        // 圖片路徑配置 (供您在 Dreamweaver 中修改)
+        const imagePaths = {
+            // 測驗結果圖 (將您的圖片放在這裡)
+            master: '{{性學大師結果圖路徑，例如：images/master.jpg}}', // 80分以上
+            apprentice: '{{性學學徒結果圖路徑，例如：images/apprentice.jpg}}', // 60-79分
+            novice: '{{性學新手結果圖路徑，例如：images/novice.jpg}}', // 60分以下
+
+            // 解析區域背景圖 (將您的圖片放在這裡)
+            analysisBg: 'images/13.jpg'
+        };
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizData = []; // 實際進行測驗的題目列表
+        let wrongAnswers = []; // 答錯的題目列表
+
+        const startScreen = document.getElementById('startScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const questionCard = document.getElementById('questionCard');
+        const progressBar = document.getElementById('progressBar');
+        const currentQuestionSpan = document.getElementById('currentQuestion');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const questionText = document.getElementById('questionText');
+        const questionDesc = document.getElementById('questionDesc');
+        const questionEmoji = document.getElementById('questionEmoji');
+        const cardBackground = document.getElementById('cardBackground');
+        const resultImagePlaceholder = document.getElementById('resultImagePlaceholder');
+        const wrongAnswersList = document.getElementById('wrongAnswersList');
+        const wrongAnswersSection = document.getElementById('wrongAnswersSection');
+        
+        // 將所有題目合併並打亂 (只取前 10 題，如果總數超過10)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function prepareQuiz() {
+            // 合併所有題目
+            let allQuestions = [...mythQuestions];
+            // 打亂題目順序
+            shuffleArray(allQuestions);
+            // 為了保持和原代碼一致，我們只取前 10 題
+            quizData = allQuestions.slice(0, 10);
+            
+            score = 0;
+            currentQuestionIndex = 0;
+            wrongAnswers = [];
+            totalQuestionsSpan.textContent = quizData.length;
+        }
+
+        function startQuiz() {
+            prepareQuiz();
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            // 初始化卡片堆疊
+            const cardStack = document.querySelector('.card-stack');
+            cardStack.innerHTML = '';
+            for (let i = 0; i < quizData.length; i++) {
+                const card = createCard(quizData[i], i);
+                cardStack.appendChild(card);
+            }
+            
+            // 顯示第一張卡片
+            updateCardDisplay();
+        }
+
+        function createCard(question, index) {
+            const card = document.createElement('div');
+            card.className = 'question-card absolute inset-0 bg-white rounded-2xl card-shadow overflow-hidden cursor-pointer';
+            card.id = `card-${index}`;
+            card.style.zIndex = quizData.length - index; // 越後面的卡片 z-index 越低
+            
+            // 預設卡片樣式
+            card.style.transform = `scale(${1 - index * 0.05}) translateY(${index * 10}px)`;
+            card.style.opacity = index === 0 ? 1 : 0.8; 
+            
+            // 背景圖片
+            const bgDiv = document.createElement('div');
+            bgDiv.className = 'absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 bg-cover bg-center';
+            // 使用題目自定義背景圖
+            if (question.backgroundImage && question.backgroundImage.startsWith('{{')) {
+                 // 如果是預留位置，使用預設漸層
+                 bgDiv.style.backgroundImage = 'none'; 
+            } else if (question.backgroundImage) {
+                bgDiv.style.backgroundImage = `url('${question.backgroundImage}')`;
+            } else {
+                // 如果沒有設定圖片，使用預設漸層
+                bgDiv.style.backgroundImage = 'none';
+            }
+            card.appendChild(bgDiv);
+
+            // 黑色漸層遮罩
+            const overlay = document.createElement('div');
+            overlay.className = 'absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none';
+            card.appendChild(overlay);
+
+            // 文字資訊
+            const textContent = document.createElement('div');
+            textContent.className = 'absolute bottom-0 left-0 right-0 p-6';
+            textContent.innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <div class="text-4xl sm:text-5xl flex-shrink-0" id="questionEmoji">${question.emoji}</div>
+                    <div class="flex-1 min-w-0">
+                        <h2 class="text-xl sm:text-2xl cute-title text-white mb-2 leading-tight drop-shadow-lg">${question.text}</h2>
+                        <p class="text-white text-sm sm:text-base leading-relaxed mb-4 drop-shadow-md cute-text">${question.desc}</p>
+                    </div>
+                </div>
+            `;
+            card.appendChild(textContent);
+
+            return card;
+        }
+
+        function updateCardDisplay() {
+            const currentCard = document.getElementById(`card-${currentQuestionIndex}`);
+            if (currentCard) {
+                 // 確保當前卡片顯示在最前面
+                 currentCard.style.zIndex = quizData.length;
+                 currentCard.style.transform = 'scale(1) translateY(0)';
+            }
+            // 更新進度條和題號
+            const progress = (currentQuestionIndex / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            currentQuestionSpan.textContent = Math.min(currentQuestionIndex + 1, quizData.length);
+        }
+
+        function processAnswer(userAnswer) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const isCorrect = (userAnswer === currentQuestion.answer);
+
+            if (isCorrect) {
+                score += 10;
+            } else {
+                wrongAnswers.push({
+                    ...currentQuestion,
+                    userAnswer: userAnswer ? '✅ (事實)' : '🚫 (迷思)',
+                    correctAnswer: currentQuestion.answer ? '✅ (事實)' : '🚫 (迷思)'
+                });
+            }
+
+            // 進行卡片動畫
+            const card = document.getElementById(`card-${currentQuestionIndex}`);
+            if (card) {
+                const swipeClass = userAnswer ? 'card-swipe-right' : 'card-swipe-left';
+                card.classList.add(swipeClass);
+
+                // 移除卡片後移動到下一題
+                setTimeout(() => {
+                    card.remove();
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < quizData.length) {
+                        // 處理下一張卡片 (如果有)
+                         const nextCard = document.getElementById(`card-${currentQuestionIndex}`);
+                         if(nextCard) {
+                            nextCard.style.transform = 'scale(1) translateY(0)';
+                            nextCard.style.opacity = 1;
+                         }
+                        updateCardDisplay();
+                    } else {
+                        showResult();
+                    }
+                }, 300); // 動畫時間
+            }
+        }
+
+        // 模擬滑動：左滑 = 迷思 (false)
+        function swipeLeft() {
+            if (currentQuestionIndex < quizData.length) {
+                processAnswer(false);
+            }
+        }
+
+        // 模擬滑動：右滑 = 事實 (true)
+        function swipeRight() {
+            if (currentQuestionIndex < quizData.length) {
+                processAnswer(true);
+            }
+        }
+
+     function showResult() {
+    quizScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+
+    const finalScore = (score / (quizData.length * 10)) * 100;
+    let resultKey, resultTitle;
+
+    if (finalScore >= 80) {
+        resultImagePlaceholder.style.backgroundImage = "url('images/f3.jpg')";
+        resultKey = 'master';
+        resultTitle = '🌟 性學大師';
+    } 
+    else if (finalScore >= 60) {
+        resultImagePlaceholder.style.backgroundImage = "url('images/f2.jpg')";
+        resultKey = 'apprentice';
+        resultTitle = '📚 性學學徒';
+    } 
+    else {
+        resultImagePlaceholder.style.backgroundImage = "url('images/f1.jpg')";
+        resultKey = 'novice';
+        resultTitle = '🌱 性學新手';
+    }
+
+            // 重新準備解析區
+            renderWrongAnswers();
+        }
+
+        function renderWrongAnswers() {
+            wrongAnswersList.innerHTML = '';
+            if (wrongAnswers.length === 0) {
+                wrongAnswersList.innerHTML = `
+                    <div class="text-white text-center p-6 bg-white bg-opacity-10 rounded-xl simple-animation cute-text">
+                        🎉 恭喜！您答對了所有題目，您是一位真正的性學大師！
+                    </div>
+                `;
+                return;
+            }
+
+            wrongAnswers.forEach((q, index) => {
+                const analysisCard = document.createElement('div');
+                analysisCard.className = 'p-6 rounded-xl bg-white bg-opacity-10 backdrop-blur-sm border border-white border-opacity-20 simple-animation';
+                analysisCard.style.backgroundImage = imagePaths.analysisBg && !imagePaths.analysisBg.startsWith('{{') ? `url('${imagePaths.analysisBg}')` : 'none';
+                analysisCard.style.backgroundSize = 'cover';
+                analysisCard.style.backgroundPosition = 'center';
+                analysisCard.style.animationDelay = `${index * 0.1}s`;
+
+                analysisCard.innerHTML = `
+                    <div class="flex items-start space-x-3 mb-3">
+                        <div class="text-3xl flex-shrink-0 text-pink-300">💡</div>
+                        <h4 class="text-xl cute-title text-yellow-300 leading-tight drop-shadow-md">【${q.text}】</h4>
+                    </div>
+                    <div class="bg-white/90 p-4 rounded-lg shadow-inner space-y-3 cute-text text-gray-800">
+                        <p><strong>您的選擇：</strong> <span class="${q.userAnswer.startsWith('🚫') ? 'text-red-600 font-bold' : 'text-green-600 font-bold'}">${q.userAnswer}</span></p>
+                        <p><strong>正確答案：</strong> <span class="text-green-700 font-bold">${q.correctAnswer}</span></p>
+                        <hr>
+                        <p class="text-sm leading-relaxed"><strong>✨ 魔法知識解析：</strong> ${q.explanation}</p>
+                    </div>
+                `;
+                wrongAnswersList.appendChild(analysisCard);
+            });
+        }
+
+        function toggleAnalysis() {
+            const btn = document.getElementById('toggleAnalysisBtn');
+            const isAnalysisHidden = wrongAnswersSection.classList.contains('hidden');
+            
+            if (isAnalysisHidden) {
+                wrongAnswersSection.classList.remove('hidden');
+                btn.textContent = '📖 返回結果';
+            } else {
+                wrongAnswersSection.classList.add('hidden');
+                btn.textContent = '📚 查看魔法解析';
+            }
+        }
+
+        function restartQuiz() {
+            wrongAnswersSection.classList.add('hidden');
+            document.getElementById('toggleAnalysisBtn').textContent = '📚 查看魔法解析';
+            startScreen.classList.remove('hidden');
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            // 清除結果圖片區塊的內聯樣式
+            resultImagePlaceholder.style.backgroundImage = ''; 
+            resultImagePlaceholder.innerHTML = '';
+        }
+
+        // 頁面加載時執行
+        document.addEventListener('DOMContentLoaded', () => {
+            // 由於移除了管理員功能，這裡不再需要初始化邏輯。
+            prepareQuiz();
+        });
+
+    </script>
+</body>
+</html>
